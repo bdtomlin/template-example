@@ -1,20 +1,21 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
-	"github.com/bdtomlin/template-example/views"
+	"github.com/gofiber/fiber"
+	"github.com/gofiber/template/pug"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		views.Render(w, "index", nil, "layouts/main")
+	engine := pug.New("./views", ".pug")
+	engine.Reload(true)
+
+	app := fiber.New(&fiber.Settings{
+		Views: engine,
 	})
 
-	http.HandleFunc("/nested", func(w http.ResponseWriter, r *http.Request) {
-		views.Render(w, "index", nil, "layouts/main", "layouts/nested")
+	app.Get("/", func(c *fiber.Ctx) {
+		c.Render("index", nil, "layouts/main")
 	})
 
-	log.Fatal(http.ListenAndServe(":3333", nil))
+	app.Listen(3000)
 }
